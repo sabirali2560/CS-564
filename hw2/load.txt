@@ -1,8 +1,8 @@
 .separator |
-.import item.dat Item
+.import Item.dat Item
 
-.import user.dat User
+.import User.dat User
 
-.import bid.dat Bid
+.import Bid.dat Bid
 
-.import cate.dat Category
+.import Category.dat Category
