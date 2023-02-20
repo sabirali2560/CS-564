@@ -1,7 +1,7 @@
 SELECT COUNT(*) FROM (
 SELECT *
-FROM Item, Category
-WHERE Item.itemID = Category.itemID
-GROUP BY Item.itemID
+FROM Item i, Category c
+WHERE i.Item_id = c.Item_id
+GROUP BY i.Item_id
 HAVING COUNT() = 4
 );

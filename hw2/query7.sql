@@ -1,4 +1,4 @@
 SELECT COUNT(DISTINCT(c.Category))
-FROM Category c, Bid
-WHERE c.ItemID = Bid.ItemID
-AND Bid.Amount > 100;
+FROM Category c, Bid b
+WHERE c.Item_id = b.Item_id
+AND b.Amount > 100;
