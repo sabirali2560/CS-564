@@ -126,21 +126,21 @@ def parseJson(json_file):
                         curr_bid_list.append("NULL")
                     curr_bid_list.append(transformDollar(bid["Bid"]["Amount"]))
                     table_dict["Bid"].append(curr_bid_list)
-                    curr_user_list = list()
-                    curr_user_list.append(bid["Bid"]["Bidder"]["UserID"])
+                    curr_user_list_1 = list()
+                    curr_user_list_1.append(bid["Bid"]["Bidder"]["UserID"])
                     if("Rating" in bid["Bid"]["Bidder"].keys()):   
-                        curr_user_list.append(bid["Bid"]["Bidder"]["Rating"])
+                        curr_user_list_1.append(bid["Bid"]["Bidder"]["Rating"])
                     else:
-                        curr_user_list.append("NULL")
+                        curr_user_list_1.append("NULL")
                     if("Location" in bid["Bid"]["Bidder"]):        
-                        curr_user_list.append(bid["Bid"]["Bidder"]["Location"])
+                        curr_user_list_1.append(bid["Bid"]["Bidder"]["Location"])
                     else:
-                        curr_user_list.append("NULL")
+                        curr_user_list_1.append("NULL")
                     if("Country" in bid["Bid"]["Bidder"]):    
-                        curr_user_list.append(bid["Bid"]["Bidder"]["Country"])
+                        curr_user_list_1.append(bid["Bid"]["Bidder"]["Country"])
                     else:
-                        curr_user_list.append("NULL")    
-                    table_dict["User"].append(curr_user_list)
+                        curr_user_list_1.append("NULL")    
+                    table_dict["User"].append(curr_user_list_1)
             curr_user_list.append(item["Seller"]["UserID"])        
             if("Rating" in item["Seller"].keys()):    
                 curr_user_list.append(item["Seller"]["Rating"])
