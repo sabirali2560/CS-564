@@ -1,16 +1,14 @@
 -- SQLite
-sqlite3
 drop table if exists User;
 drop table if exists Item; 
 drop table if exists Bid; 
 drop table if exists Category;
 
-
 CREATE TABLE User (
 User_id CHAR(256) PRIMARY KEY, 
 Rating INT, 
 Location CHAR(256), 
-Country CHAR(256), 
+Country CHAR(256)
 );
 
 CREATE TABLE Item ( 
