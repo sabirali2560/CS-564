@@ -1,5 +1,7 @@
 main:
 	sh runParser.sh
+	sqlite3 ebay.db < create.sql
+	sqlite3 ebay.db < load.txt
 
 test: 
 	sqlite3 ebay.db < query1.sql
