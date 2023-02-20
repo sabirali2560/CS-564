@@ -219,7 +219,7 @@ def main(argv):
         sys.exit(1)
     filenames = ["User.dat", "Item.dat", "Category.dat", "Bid.dat"]  
     for filename in filenames:
-        with open(filename, "r+") as fp:
+        with open(filename, "w+") as fp:
             fp.truncate(0)  
     # loops over all .json files in the argument
     for f in argv[1:]:
