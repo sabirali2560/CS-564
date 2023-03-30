@@ -1,6 +1,6 @@
 #include <memory.h>
 #include <unistd.h>
-#include <errno.h>
+#include <error.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <iostream>
@@ -65,21 +65,77 @@ BufMgr::~BufMgr() {
 
 const Status BufMgr::allocBuf(int & frame) 
 {
-
-
-
-
-
+    for (int i = 0; i < 2*numBufs; i++)
+        {
+            // move clock pointer to next
+            advanceClock();
+            BufDesc *bufDesc_pt = &bufTable[clockHand];
+            // check valid?
+            if (bufDesc_pt->valid) 
+            {
+                // refbig is true
+                if (bufDesc_pt->refbit)
+                {
+                    // set to false, and skip
+                    bufDesc_pt->refbit = false;
+                    continue;
+                }
+                else {
+                // checked: refbig is fale, valid is true
+                    // check pinned?
+                    if (bufDesc_pt->pinCnt > 0)
+                    {
+                        // is Pinned, skip
+                        continue;
+                    }
+                    else
+                    {   // check dirty?
+                        if (bufDesc_pt->dirty) 
+                        {
+                            // write page to disk
+                            if ((bufDesc_pt->file->writePage(bufDesc_pt->pageNo, &bufPool[clockHand]))!= OK) return UNIXERR;
+                        }
+                    }
+                }
+                // update hashtable
+                hashTable->remove(bufDesc_pt->file, bufDesc_pt->pageNo);
+            }
+            // update frame and bufDesc
+            frame = bufDesc_pt->frameNo;
+            bufDesc_pt->Clear();
+            return OK;
+        }
+        // not find
+        return BUFFEREXCEEDED;
 
 }
 
 	
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
-
-
-
-
+    int frameNo;
+    try
+    {
+        // Case 2 The page is in the buffer pool.
+        // update refbit, pinCnt, and returnPointer
+        hashTable->lookup(file, PageNo, frameNo);
+        bufTable[frameNo].refbit = true;
+        bufTable[frameNo].pinCnt += 1;
+        page = &bufPool[frameNo];
+    }
+    catch (Status e)
+    {
+        // Case 1 The page is not in the buffer pool
+        // allocate Buf, update hashtable, buftable
+        Status temp;
+        temp = allocBuf(frameNo);
+        if (temp != OK) return temp; 
+        if (file->readPage(PageNo, page) != OK) return UNIXERR;
+        bufPool[frameNo]= *page;
+        if (hashTable->insert(file, PageNo, frameNo) != OK) return HASHTBLERROR;
+        bufTable[frameNo].Set(file, PageNo);
+    }
+    return OK;
 
 }
 
