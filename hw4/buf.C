@@ -1,6 +1,6 @@
 #include <memory.h>
 #include <unistd.h>
-#include <error.h>
+#include "error.h"
 #include <stdlib.h>
 #include <fcntl.h>
 #include <iostream>
@@ -127,8 +127,8 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
         Status temp;
         temp = allocBuf(frameNo);
         if (temp != OK) return temp; 
+        page = &bufPool[frameNo];
         if (file->readPage(PageNo, page) != OK) return UNIXERR;
-        bufPool[frameNo]= *page;
         if (hashTable->insert(file, PageNo, frameNo) != OK) return HASHTBLERROR;
         bufTable[frameNo].Set(file, PageNo);
     }
@@ -141,22 +141,32 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 const Status BufMgr::unPinPage(File* file, const int PageNo, 
 			       const bool dirty) 
 {
-
-
-
-
-
+   int frameNo;
+   Status status = hashTable->lookup(file, PageNo, frameNo);
+   if(status == HASHNOTFOUND)
+     return HASHNOTFOUND;
+   if(bufTable[frameNo].pinCnt == 0)
+    return PAGENOTPINNED;
+   (bufTable[frameNo].pinCnt)--;
+   bufTable[frameNo].dirty = dirty;
+   return OK;
 }
 
 const Status BufMgr::allocPage(File* file, int& pageNo, Page*& page) 
 {
-
-
-
-
-
-
-
+    Status status = file->allocatePage(pageNo);
+    if(status != OK)
+       return status;
+    int frame;
+    status = allocBuf(frame);
+    if(status != OK)
+     return status;
+    page = &bufPool[frame]; 
+    status = hashTable->insert(file, pageNo, frame);
+    if(status!=OK)
+     return status;
+    bufTable[frame].Set(file, pageNo);
+    return OK;
 }
 
 const Status BufMgr::disposePage(File* file, const int pageNo) 

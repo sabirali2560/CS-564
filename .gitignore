@@ -2,3 +2,7 @@ hw2/ebay_data/**
 hw2/supporting-material/**
 hw2/ebay.db
 .DS_Store
+hw4/test.*
+hw4/testbuf
+.vscode/
+hw4/*.o
