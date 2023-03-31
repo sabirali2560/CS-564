@@ -114,17 +114,14 @@ const Status BufMgr::allocBuf(int & frame)
 const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
 {
     int frameNo;
-    try
-    {
+
         // Case 2 The page is in the buffer pool.
         // update refbit, pinCnt, and returnPointer
-        hashTable->lookup(file, PageNo, frameNo);
+    if (hashTable->lookup(file, PageNo, frameNo) != HASHNOTFOUND){
         bufTable[frameNo].refbit = true;
         bufTable[frameNo].pinCnt += 1;
         page = &bufPool[frameNo];
-    }
-    catch (Status e)
-    {
+    }else{
         // Case 1 The page is not in the buffer pool
         // allocate Buf, update hashtable, buftable
         Status temp;
@@ -136,8 +133,9 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
         bufTable[frameNo].Set(file, PageNo);
     }
     return OK;
-
+       
 }
+   
 
 
 const Status BufMgr::unPinPage(File* file, const int PageNo, 
