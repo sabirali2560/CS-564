@@ -86,13 +86,24 @@ const Status BufMgr::allocBuf(int & frame)
                     if (bufDesc_pt->pinCnt > 0)
                     {
                         // is Pinned, skip
+                        // if(bufDesc_pt->pageNo == 27){
+                        //     cout<<"AllocBuf unpin count"<<endl;
+                        // }
                         continue;
                     }
                     else
                     {   // check dirty?
+                        // if(bufDesc_pt->pageNo == 27){
+                        //     //cout<< bufDesc_pt->frame;
+                        //     cout<<"Is page dirty: "<< bufDesc_pt->dirty <<endl;
+                        // }
                         if (bufDesc_pt->dirty) 
                         {
                             // write page to disk
+                            // if(bufDesc_pt->pageNo == 27){
+                            //     cout<<"I am writing page"<<endl;
+                            //     cout<<&bufPool[clockHand]<<endl;
+                            // }
                             if ((bufDesc_pt->file->writePage(bufDesc_pt->pageNo, &bufPool[clockHand]))!= OK) return UNIXERR;
                         }
                     }
@@ -124,6 +135,7 @@ const Status BufMgr::readPage(File* file, const int PageNo, Page*& page)
     }else{
         // Case 1 The page is not in the buffer pool
         // allocate Buf, update hashtable, buftable
+        //cout<<PageNo<<endl;
         Status temp;
         temp = allocBuf(frameNo);
         if (temp != OK) return temp; 
@@ -147,8 +159,15 @@ const Status BufMgr::unPinPage(File* file, const int PageNo,
      return HASHNOTFOUND;
    if(bufTable[frameNo].pinCnt == 0)
     return PAGENOTPINNED;
+//    if(PageNo == 27){
+//      cout<<"In unpin page"<<frameNo<<endl;
+//    } 
    (bufTable[frameNo].pinCnt)--;
+   if(dirty == true)
    bufTable[frameNo].dirty = dirty;
+//    if(PageNo == 27){
+//      cout<<"In unpin page"<<frameNo<<" Is dirty"<< bufTable[frameNo].dirty<<endl;
+//    } 
    return OK;
 }
 
