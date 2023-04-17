@@ -311,7 +311,9 @@ const Status HeapFileScan::scanNext(RID& outRid)
                 return status;
             }
             if(matchRec(rec)){
-                break;
+                outRid = nextRid;
+                curRec = outRid;
+                return OK;
             }
             tmpRid = nextRid;   
             status = curPage->nextRecord(tmpRid, nextRid);
@@ -331,6 +333,7 @@ const Status HeapFileScan::scanNext(RID& outRid)
         }
         curPageNo = nextPageNo;
         curDirtyFlag = false;
+        curPage->firstRecord(nextRid);
     }
     outRid = nextRid;
     curRec = outRid;
@@ -460,25 +463,36 @@ const Status InsertFileScan::insertRecord(const Record & rec, RID& outRid)
 
     if(curPage == NULL){
         status = bufMgr->readPage(filePtr, headerPage->lastPage, curPage);
-        curPageNo = headerPage->lastPage;
-        curDirtyFlag = false;
         if(status != OK)
             return status;
+        //printf("I am here too");    
+        curPageNo = headerPage->lastPage;
+        curDirtyFlag = false;
     }
 
     status = curPage->insertRecord(rec, outRid);
     if(status == NOSPACE)
     {
         status = bufMgr->allocPage(filePtr, newPageNo, newPage);
+        curPage->setNextPage(newPageNo);
+        newPage->init(newPageNo);
         if(status != OK)
             return status;
         headerPage->lastPage = newPageNo;
         (headerPage->pageCnt)++;
         status = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
-        curPage = newPage;
-        status = curPage->insertRecord(rec, outRid);
         if(status != OK)
+          return status;
+        //printf("curPage : %d\n", curPage);
+        //printf("newPage : %d\n" , newPage);  
+        curPage = newPage;
+        curPageNo = newPageNo;
+        //printf("freeSpace : %d\n", newPage->getFreeSpace());
+        status = curPage->insertRecord(rec, outRid);
+        if(status != OK){
+            //printf("I am here not able to insert\n");
             return status;
+        }
     }
     else if(status != OK){
         return status;
