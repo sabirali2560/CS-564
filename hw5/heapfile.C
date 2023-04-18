@@ -324,15 +324,15 @@ const Status HeapFileScan::scanNext(RID& outRid)
             status = curPage->nextRecord(tmpRid, curRec);
         }
 
+        // If this is last page break out of loop
+        if(curPageNo == headerPage->lastPage){
+            break;
+        }
+
         // unpin previous page
         status = bufMgr->unPinPage(filePtr, curPageNo, curDirtyFlag);
         if(status != OK){
             return status;
-        }
-
-        // If this is last page break out of loop
-        if(curPageNo == headerPage->lastPage){
-            break;
         }
 
         // Go onto next page
@@ -349,7 +349,7 @@ const Status HeapFileScan::scanNext(RID& outRid)
     }
     
     //since we didn't find any matching next record return EOF
-    curPage = NULL;
+    //curPage = NULL;
     return FILEEOF;
 }
 
