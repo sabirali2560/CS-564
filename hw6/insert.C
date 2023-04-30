@@ -66,7 +66,7 @@ const Status QU_Insert(const string & relation,
 			// 11111 matches attributes
 			if (strcmp(attrsArray[i].attrName, attrList[j].attrName) == 0 && attrsArray[i].attrType == attrList[j].attrType) {
 				flag = 1;
-				// moving actual data to the outputData, type conversion
+				//moving actual data to the outputData, type conversion
 				switch(attrsArray[i].attrType){
 					case 0:
 						memcpy(outputData + attrsArray[i].attrOffset, (char *)attrList[j].attrValue, attrsArray[i].attrLen);
@@ -79,8 +79,11 @@ const Status QU_Insert(const string & relation,
 						temp2 = atof((char *)attrList[j].attrValue);	
 						memcpy(outputData + attrsArray[i].attrOffset, (char *)&temp2, attrsArray[i].attrLen);
 						break;
+					default:
+						return ATTRTYPEMISMATCH;	
 				}
-				return ATTRTYPEMISMATCH;
+				//memcpy(outputData + attrsArray[i].attrOffset, (char *)attrList[j].attrValue, attrsArray[i].attrLen);
+			
 			}
 		}
 		// 00000 no matches attributes
